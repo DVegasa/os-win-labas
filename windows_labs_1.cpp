@@ -160,19 +160,40 @@ void printVolumeInformation(char c) {
     printDriveFlags(FileSF);
 }
 
-void printFreeSpace() {
-    LPCTSTR lpDirectoryName;                   // имя диска(директории) [in]
-    PULARGE_INTEGER lpFreeBytesAvailable;      // доступно для использования(байт) [out]
-    PULARGE_INTEGER lpTotalNumberOfBytes;      // максимальный объём( в байтах ) [out]
-    PULARGE_INTEGER lpTotalNumberOfFreeBytes;  // свободно на диске( в байтах ) [out]
+void printFreeSpace(char c) {
+    char d[3];
+    d[0] = c;
+    d[1] = ':';
+    d[2] = '\\';
+    d[3] = '\0';
+
+    LPCTSTR lpDirectoryName = d;       // имя диска(директории) [in]
+    __int64 lpFreeBytesAvailable;      // доступно для использования(байт) [out]
+    __int64 lpTotalNumberOfBytes;      // максимальный объём( в байтах ) [out]
+    __int64 lpTotalNumberOfFreeBytes;  // свободно на диске( в байтах ) [out]
+
+    BOOL b = GetDiskFreeSpaceEx(  // Без присваивания работает неправильно
+        lpDirectoryName,
+        (PULARGE_INTEGER)&lpFreeBytesAvailable,
+        (PULARGE_INTEGER)&lpTotalNumberOfBytes,
+        (PULARGE_INTEGER)&lpTotalNumberOfFreeBytes);
+
+    cout << "Всего памяти: " << stringedSize(lpTotalNumberOfBytes)
+         << " (" << lpTotalNumberOfBytes << " B)" << endl;
+
+    cout << "\tИз неё свободно: " << stringedSize(lpTotalNumberOfFreeBytes)
+         << " (" << lpTotalNumberOfFreeBytes << " B)" << endl;
+
+    cout << "\tИз неё доступно: " << stringedSize(lpFreeBytesAvailable)
+         << " (" << lpFreeBytesAvailable << " B)" << endl;
 }
 
 void printDriveInfo(char c) {
     cout << endl;
     cout << c << ":\\" << endl;
     cout << "Тип: " << _getDriveType(c) << endl;
+    printFreeSpace(c);
     printVolumeInformation(c);
-    printFreeSpace();
 }
 
 int main(void) {

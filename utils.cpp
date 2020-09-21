@@ -7,7 +7,7 @@
 using namespace std;
 
 string stringedSize(long long int bytes) {
-    double result = bytes;
+    long long int result = bytes;
     string suffix = "";
 
     if (bytes < 1024) {
