@@ -86,8 +86,6 @@ int main(void) {
     cin >> pathFrom;
     cout << "Введите адрес файла, куда вставить:\n";
     cin >> pathTo;
-    // cout << "Удалить после копирования?: \n";
-    // cin >> toDelete;
 
     HANDLE hFrom;
     HANDLE hTo;
@@ -101,8 +99,10 @@ int main(void) {
 
     cout << "С какого символа начать копирование?:\n";
     cin >> n;
+    cout << "Удалить после копирования?: \n";
+    cin >> toDelete;
 
-    int BUFFER_SIZE = 101; // Максимальное кол-во символов в буфере
+    int BUFFER_SIZE = 501;  // Максимальное кол-во символов в буфере
     char ReadBuffer[BUFFER_SIZE] = {0};
     OVERLAPPED ol = {0};
     cout << ReadFileEx(hFrom, ReadBuffer, BUFFER_SIZE - 1, &ol, NULL) << endl;
@@ -113,7 +113,11 @@ int main(void) {
     CloseHandle(hFrom);
     CloseHandle(hTo);
 
-    cout << "OK" << endl;
+    if (toDelete) {
+        DeleteFile((LPCSTR)pathFrom);
+    }
+
+    cout << "Done!" << endl;
 
     return 0;
 }
