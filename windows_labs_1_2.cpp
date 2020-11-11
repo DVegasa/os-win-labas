@@ -3,6 +3,8 @@
 #include <string>
 
 #include "utils.cpp"
+#undef UNICODE
+#define UNICODE
 #include "windows.h"
 
 using namespace std;
@@ -77,15 +79,13 @@ HANDLE createFile(char path[255]) {
 
 int main(void) {
     char pathFrom[255], pathTo[255];
-    int symbFrom;
+    int n;
     bool toDelete;
 
     cout << "Введите адрес файла, откуда копировать:\n";
     cin >> pathFrom;
     cout << "Введите адрес файла, куда вставить:\n";
     cin >> pathTo;
-    // cout << "С какого символа начать копирование?:\n";
-    // cin >> symbFrom;
     // cout << "Удалить после копирования?: \n";
     // cin >> toDelete;
 
@@ -99,7 +99,16 @@ int main(void) {
         return -1;
     }
 
-    
+    cout << "С какого символа начать копирование?:\n";
+    cin >> n;
+
+    int BUFFER_SIZE = 101; // Максимальное кол-во символов в буфере
+    char ReadBuffer[BUFFER_SIZE] = {0};
+    OVERLAPPED ol = {0};
+    cout << ReadFileEx(hFrom, ReadBuffer, BUFFER_SIZE - 1, &ol, NULL) << endl;
+    cout << "###: " << ReadBuffer << endl;
+
+    WriteFileEx(hTo, &ReadBuffer[n], BUFFER_SIZE - 1 - n, &ol, NULL);
 
     CloseHandle(hFrom);
     CloseHandle(hTo);
