@@ -7,6 +7,24 @@
 
 using namespace std;
 
+string getLastErrorStr() {
+    //Get the error message, if any.
+    DWORD errorMessageID = GetLastError();
+    if (errorMessageID == 0)
+        return std::string();  //No error message has been recorded
+
+    LPSTR messageBuffer = nullptr;
+    size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+
+    std::string message(messageBuffer, size);
+
+    //Free the buffer.
+    LocalFree(messageBuffer);
+
+    return message;
+}
+
 HANDLE openFile(char path[255], bool accessWrite = false) {
     LPCTSTR lpFileName;                                 // file name
     DWORD dwDesiredAccess = GENERIC_READ;               // access mode
@@ -32,7 +50,7 @@ HANDLE openFile(char path[255], bool accessWrite = false) {
 
     if (handle == INVALID_HANDLE_VALUE) {
         stringstream ss;
-        ss << "[ed__ 1] OpenFileError: " << GetLastError();
+        ss << "Не удалось открыть файл. Код ошибки: " << GetLastError();
         throw ss.str();
     }
 
@@ -51,7 +69,7 @@ HANDLE createFile(char path[255]) {
 
     if (handle == INVALID_HANDLE_VALUE) {
         stringstream ss;
-        ss << "[ed__ 2] CreateFileError: " << GetLastError();
+        ss << "Не удалось создать файл. Код ошибки: " << GetLastError();
         throw ss.str();
     }
     return handle;
@@ -80,6 +98,8 @@ int main(void) {
         cout << "Ошибка: " << error << endl;
         return -1;
     }
+
+    
 
     CloseHandle(hFrom);
     CloseHandle(hTo);
