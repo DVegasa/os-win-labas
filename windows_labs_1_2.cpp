@@ -32,32 +32,29 @@ HANDLE openFile(char path[255], bool accessWrite = false) {
 
     if (handle == INVALID_HANDLE_VALUE) {
         stringstream ss;
-        ss << "OpenFileError: " << GetLastError();
+        ss << "[ed__ 1] OpenFileError: " << GetLastError();
         throw ss.str();
     }
 
     return handle;
 }
 
-string _readFile(HANDLE handle, int symbFrom) {
-    return NULL;
-}
+HANDLE createFile(char path[255]) {
+    HANDLE handle = CreateFile(
+        LPCSTR(path),
+        GENERIC_WRITE,
+        FILE_SHARE_READ,
+        NULL,
+        CREATE_ALWAYS,
+        NULL,
+        NULL);
 
-void doCopy(char pathFrom[255], char pathTo[255], int symbFrom) {
-    HANDLE handleFrom;
-    HANDLE handleTo;
-
-    try {
-        handleFrom = openFile(pathFrom, false);
-        handleTo = openFile(pathTo, true);
-    } catch (string error) {
-        cout << error;
+    if (handle == INVALID_HANDLE_VALUE) {
+        stringstream ss;
+        ss << "[ed__ 2] CreateFileError: " << GetLastError();
+        throw ss.str();
     }
-
-    // string buffer = _readFile(handleFrom, symbFrom);
-}
-
-void deleteFile(char path[255]) {
+    return handle;
 }
 
 int main(void) {
@@ -65,31 +62,29 @@ int main(void) {
     int symbFrom;
     bool toDelete;
 
-
     cout << "Введите адрес файла, откуда копировать:\n";
     cin >> pathFrom;
-
-    try {
-        HANDLE test = openFile(pathFrom, false);
-    } catch (string error) {
-        cout << error << endl;
-    }
-    cout << "OK" << endl;
-    return 0;
-
-
-
     cout << "Введите адрес файла, куда вставить:\n";
     cin >> pathTo;
-    cout << "С какого символа начать копирование?:\n";
-    cin >> symbFrom;
-    cout << "Удалить после копирования?: \n";
-    cin >> toDelete;
+    // cout << "С какого символа начать копирование?:\n";
+    // cin >> symbFrom;
+    // cout << "Удалить после копирования?: \n";
+    // cin >> toDelete;
 
-    doCopy(pathFrom, pathTo, symbFrom);
-
-    if (toDelete) {
-        deleteFile(pathFrom);
+    HANDLE hFrom;
+    HANDLE hTo;
+    try {
+        hFrom = openFile(pathFrom, false);
+        hTo = createFile(pathTo);
+    } catch (string error) {
+        cout << "Ошибка: " << error << endl;
+        return -1;
     }
+
+    CloseHandle(hFrom);
+    CloseHandle(hTo);
+
+    cout << "OK" << endl;
+
     return 0;
 }
