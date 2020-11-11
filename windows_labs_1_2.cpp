@@ -9,24 +9,6 @@
 
 using namespace std;
 
-// string getLastErrorStr() {
-//     //Get the error message, if any.
-//     DWORD errorMessageID = GetLastError();
-//     if (errorMessageID == 0)
-//         return std::string();  //No error message has been recorded
-
-//     LPSTR messageBuffer = nullptr;
-//     size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-//                                  NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
-
-//     std::string message(messageBuffer, size);
-
-//     //Free the buffer.
-//     LocalFree(messageBuffer);
-
-//     return message;
-// }
-
 HANDLE openFile(char path[255], bool accessWrite = false) {
     LPCTSTR lpFileName;                                 // file name
     DWORD dwDesiredAccess = GENERIC_READ;               // access mode
@@ -78,7 +60,7 @@ HANDLE createFile(char path[255]) {
 }
 
 int main(void) {
-    char pathFrom[255], pathTo[255]; // 255 -- максимальный путь в NTFS
+    char pathFrom[255], pathTo[255];  // 255 -- максимальный путь в NTFS
     int n;
     bool toDelete;
 
@@ -102,33 +84,32 @@ int main(void) {
     cout << "Удалить после копирования?: \n";
     cin >> toDelete;
 
-    LARGE_INTEGER size;
-    cout << "$$: " << GetFileSizeEx(hFrom, &size) << endl;
-    cout << "$$$: " << size.QuadPart << endl;  // Размер файла (количество символов)
+    LARGE_INTEGER size;  // Размер файла в байтах (количество символов)
+    GetFileSizeEx(hFrom, &size);
+    cout << "Исходный файл содержит символов: " << size.QuadPart << endl;
 
     if (n > size.QuadPart) {
-        cout << "Ошибка: в исходном файле всего-лишь " << size.QuadPart << " символов";
+        cout << "Ошибка: в исходном файле всего " << size.QuadPart << " символов";
         CloseHandle(hFrom);
         CloseHandle(hTo);
         return -1;
     }
 
-    int BUFFER_SIZE = size.QuadPart + 1;           // Максимальное кол-во символов в буфере
-    char ReadBuffer[BUFFER_SIZE] = {0}; // Тут будут символы из файла
-    OVERLAPPED ol = {0}; // Магическая штука, без которой не работает
+    int BUFFER_SIZE = size.QuadPart + 1;  // Максимальное кол-во символов в буфере
+    char ReadBuffer[BUFFER_SIZE] = {0};   // Тут будут символы из файла
+    OVERLAPPED ol = {0};                  // Магическая штука, без которой не работает
 
-    cout << "$: " << ReadFileEx(hFrom, ReadBuffer, BUFFER_SIZE - 1, &ol, NULL) << endl;
+    ReadFileEx(hFrom, ReadBuffer, BUFFER_SIZE - 1, &ol, NULL);
     WriteFileEx(hTo, &ReadBuffer[n], BUFFER_SIZE - 1 - n, &ol, NULL);
 
+    cout << "Успешно скопировано символов: " << BUFFER_SIZE - 1 - n << endl;
     // Закрываем хендлы
     CloseHandle(hFrom);
     CloseHandle(hTo);
 
-    if (toDelete) { // Если надо, то удаляем исходный файл
+    if (toDelete) {  // Если надо, то удаляем исходный файл
         DeleteFile((LPCSTR)pathFrom);
     }
-
-    cout << "Done!" << endl;
-
+    
     return 0;
 }
