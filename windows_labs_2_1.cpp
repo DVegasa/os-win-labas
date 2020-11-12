@@ -14,10 +14,10 @@ void printRamInfo() {
         cout << "Загрузка: " << statex.dwMemoryLoad << "%" << endl;
         cout << "Доступно: "
              << stringedSize(statex.dwAvailPhys)
-             << "(" << statex.dwAvailPhys << " B)"
+             << " (" << statex.dwAvailPhys << " B)"
              << " из "
              << stringedSize(statex.dwTotalPhys)
-             << "(" << statex.dwTotalPhys << " B)"
+             << " (" << statex.dwTotalPhys << " B)"
              << endl << endl;
 
         Sleep(1000);
