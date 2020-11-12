@@ -3,11 +3,24 @@
 #include <thread>
 
 #include "utils.cpp"
-#include "windows.h"
+#include "windows.h" 
 
 void printRamInfo() {
     while (true) {
         cout << "Ram" << endl;
+        MEMORYSTATUS statex;
+        statex.dwLength = sizeof (statex);
+        GlobalMemoryStatus(&statex);
+
+        cout << "Загрузка: " << statex.dwMemoryLoad << "%" << endl;
+        cout << "Доступно: "
+             << stringedSize(statex.dwAvailPhys)
+             << "(" << statex.dwAvailPhys << " B)"
+             << "из "
+             << stringedSize(statex.dwTotalPhys)
+             << "(" << statex.dwTotalPhys << " B)"
+             << endl;
+
         Sleep(1000);
     }
 }
