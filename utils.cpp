@@ -7,7 +7,7 @@
 using namespace std;
 
 string stringedSize(long long int bytes) {
-    long long int result = bytes;
+    long double result = bytes;
     string suffix = "";
 
     if (bytes < 1024) {
@@ -27,7 +27,7 @@ string stringedSize(long long int bytes) {
     }
 
     stringstream ss;
-    ss << fixed << setprecision(1);
+    ss << fixed << setprecision(2);
     ss << result << " " << suffix;
     return ss.str();
 }

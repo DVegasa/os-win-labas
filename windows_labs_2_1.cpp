@@ -7,7 +7,6 @@
 
 void printRamInfo() {
     while (true) {
-        cout << "Ram" << endl;
         MEMORYSTATUS statex;
         statex.dwLength = sizeof (statex);
         GlobalMemoryStatus(&statex);
@@ -16,10 +15,10 @@ void printRamInfo() {
         cout << "Доступно: "
              << stringedSize(statex.dwAvailPhys)
              << "(" << statex.dwAvailPhys << " B)"
-             << "из "
+             << " из "
              << stringedSize(statex.dwTotalPhys)
              << "(" << statex.dwTotalPhys << " B)"
-             << endl;
+             << endl << endl;
 
         Sleep(1000);
     }
