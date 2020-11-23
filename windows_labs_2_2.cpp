@@ -33,6 +33,44 @@ void commit(LPVOID& lpAddress, int n, int shift) {
     // cout << "#commit after: " << lpAddress << endl;
 }
 
+string stateToString(int s) {
+    switch (s) {
+        case MEM_COMMIT:
+            return "MEM_COMMIT";
+        case MEM_FREE:
+            return "MEM_FREE";
+        case MEM_RESERVE:
+            return "MEM_RESERVE";
+        default:
+            return "???";
+    }
+}
+
+string protectToString(int p) {
+    switch (p) {
+        case PAGE_EXECUTE:
+            return "PAGE_EXECUTE";
+        case PAGE_EXECUTE_READ:
+            return "PAGE_EXECUTE_READ";
+        case PAGE_EXECUTE_READWRITE:
+            return "PAGE_EXECUTE_READWRITE";
+        case PAGE_EXECUTE_WRITECOPY:
+            return "PAGE_EXECUTE_WRITECOPY";
+        case PAGE_NOACCESS:
+            return "PAGE_NOACCESS";
+        case PAGE_READONLY:
+            return "PAGE_READONLY";
+        case PAGE_READWRITE:
+            return "PAGE_READWRITE";
+        case PAGE_WRITECOPY:
+            return "PAGE_WRITECOPY";
+        case 0:
+            return "NO ACCESS";
+        default:
+            return "???";
+    }
+}
+
 int main(void) {
     // 1
     cout << "Размер страницы в данной системе: " << stringedSize(getPageSize()) << endl;
@@ -72,8 +110,8 @@ int main(void) {
 
     // 3
     const int SIZE = 3;
-    DWORD a[SIZE] = {42, 100, 24}; 
-    LPDWORD pointer = (LPDWORD) lpComitted;
+    DWORD a[SIZE] = {42, 100, 24};
+    LPDWORD pointer = (LPDWORD)lpComitted;
     errno_t err = memcpy_s(pointer, sizeof(pointer) * SIZE, a, sizeof(DWORD) * SIZE);
     if (err == EINVAL) {
         cout << "Ошибка при memcpy_s EINVAL: " << err << endl;
@@ -87,5 +125,29 @@ int main(void) {
         cout << pointer[i] << endl;
     }
     cout << "-----------" << endl;
+
+    // 4
+    cout << "Инфа про коммитный участок: " << endl;
+    cout << "Адрес: " << lpComitted << endl;
+    MEMORY_BASIC_INFORMATION lpBuffer;
+    if (VirtualQuery(lpComitted, &lpBuffer, sizeof(lpBuffer)) == 0) {
+        cout << "Ошибка VirtualQuery 1: " << GetLastError() << endl;
+    }
+    cout << "State: " << stateToString(lpBuffer.State) << endl;
+    cout << "Protect: " << protectToString(lpBuffer.Protect) << endl << endl;
+
+    if (from + nCommit >= n) {
+        cout << "Следующая страница находится вне зарезерированной памяти" << endl;
+    }
+    cout << "Инфа про страницу за коммитным участком: " << endl;
+    MEMORY_BASIC_INFORMATION lpBuffer2;
+    LPVOID p = lpComitted + getPageSize() * (nCommit + 1);
+    cout << "Адрес: " << p << endl;
+    if (VirtualQuery(p, &lpBuffer2, sizeof(lpBuffer2)) == 0) {
+        cout << "Ошибка VirtualQuery 2: " << GetLastError() << endl;
+    }
+    cout << "State: " << stateToString(lpBuffer2.State) << endl;
+    cout << "Protect: " << protectToString(lpBuffer2.Protect) << endl << endl;
+
     return 0;
 }
