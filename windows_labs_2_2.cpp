@@ -2,9 +2,11 @@
 #include <string>
 
 #include "utils.cpp"
-#include "windows.h" 
+#include "windows.h"
 
 using namespace std;
+
+string ERR_ALLOCATION = string("Ошибка при аллокации памяти");
 
 DWORD getPageSize() {
     SYSTEM_INFO siSysInfo;
@@ -12,11 +14,28 @@ DWORD getPageSize() {
     return siSysInfo.dwPageSize;
 }
 
+LPVOID doAlloc(int n) {
+    LPVOID lpAddress;
+    if (VirtualAlloc(lpAddress, getPageSize(), MEM_RESERVE, PAGE_READWRITE) == NULL) {
+        throw ERR_ALLOCATION;
+    }
+    return lpAddress;
+}
+
 int main(void) {
-    cout << "Размер страницы в данной системе: ";
-    cout << stringedSize(getPageSize()) << endl;
-    cout << "Кол-во страниц для резервации: " << endl;
+    // 1
+    cout << "Размер страницы в данной системе: " << stringedSize(getPageSize()) << endl;
+    cout << "Введите кол-во страниц для резервации: " << endl;
     int n;
     cin >> n;
+    LPVOID lpAddress;
+    try {
+        lpAddress = doAlloc(n);
+    } catch (string s) {
+        cout << s << endl;
+        return -1;
+    }
+    cout << "Начальный адрес: " << lpAddress;
+    // 2
     return 0;
 }
