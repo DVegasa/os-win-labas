@@ -150,19 +150,22 @@ int main(void) {
          << endl;
 
     // 5
-    MEMORY_BASIC_INFORMATION lpBuffer3;
-    LPVOID p2 = lpComitted + getPageSize() * (nCommit);
-    commit(p2, 1, 0, PAGE_READONLY);
-    cout << "Закоммиченно ещё" << endl;
+    if (from + nCommit < n) {
+        MEMORY_BASIC_INFORMATION lpBuffer3;
+        LPVOID p2 = lpComitted + getPageSize() * (nCommit);
+        commit(p2, 1, 0, PAGE_READONLY);
+        cout << "Закоммиченно ещё" << endl;
 
-    cout << "Адрес: " << p2 << endl;
-    if (VirtualQuery(p2, &lpBuffer3, sizeof(lpBuffer3)) == 0) {
-        cout << "Ошибка VirtualQuery 3: " << GetLastError() << endl;
+        cout << "Адрес: " << p2 << endl;
+        if (VirtualQuery(p2, &lpBuffer3, sizeof(lpBuffer3)) == 0) {
+            cout << "Ошибка VirtualQuery 3: " << GetLastError() << endl;
+        }
+        cout << "State: " << stateToString(lpBuffer3.State) << endl;
+        cout << "Protect: " << protectToString(lpBuffer3.Protect) << endl
+             << endl;
+    } else {
+        cout << "Следующая страница не зарезервирована. Пропуск 5 шага" << endl;
     }
-    cout << "State: " << stateToString(lpBuffer3.State) << endl;
-    cout << "Protect: " << protectToString(lpBuffer3.Protect) << endl
-         << endl;
-
     // 6
     cout << "Сколько страниц освободить?" << endl;
     int nToDecommit;
