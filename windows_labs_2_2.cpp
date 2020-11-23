@@ -23,14 +23,12 @@ LPVOID doAlloc(int n) {
     return lpAddress;
 }
 
-void commit(LPVOID& lpAddress, int n, int shift) {
-    // cout << "#commit before: " << lpAddress << endl;
+void commit(LPVOID& lpAddress, int n, int shift, int flag = PAGE_READWRITE) {
     lpAddress = lpAddress + getPageSize() * shift;
 
-    if (VirtualAlloc(lpAddress, getPageSize() * n, MEM_COMMIT, PAGE_READWRITE) == NULL) {
+    if (VirtualAlloc(lpAddress, getPageSize() * n, MEM_COMMIT, flag) == NULL) {
         throw ERR_COMMIT;
     }
-    // cout << "#commit after: " << lpAddress << endl;
 }
 
 string stateToString(int s) {
@@ -134,20 +132,35 @@ int main(void) {
         cout << "Ошибка VirtualQuery 1: " << GetLastError() << endl;
     }
     cout << "State: " << stateToString(lpBuffer.State) << endl;
-    cout << "Protect: " << protectToString(lpBuffer.Protect) << endl << endl;
+    cout << "Protect: " << protectToString(lpBuffer.Protect) << endl
+         << endl;
 
     if (from + nCommit >= n) {
         cout << "Следующая страница находится вне зарезерированной памяти" << endl;
     }
     cout << "Инфа про страницу за коммитным участком: " << endl;
     MEMORY_BASIC_INFORMATION lpBuffer2;
-    LPVOID p = lpComitted + getPageSize() * (nCommit + 1);
+    LPVOID p = lpComitted + getPageSize() * (nCommit);
     cout << "Адрес: " << p << endl;
     if (VirtualQuery(p, &lpBuffer2, sizeof(lpBuffer2)) == 0) {
         cout << "Ошибка VirtualQuery 2: " << GetLastError() << endl;
     }
     cout << "State: " << stateToString(lpBuffer2.State) << endl;
-    cout << "Protect: " << protectToString(lpBuffer2.Protect) << endl << endl;
+    cout << "Protect: " << protectToString(lpBuffer2.Protect) << endl
+         << endl;
 
+    // 5
+    MEMORY_BASIC_INFORMATION lpBuffer3;
+    LPVOID p2 = lpComitted + getPageSize() * (nCommit);
+    commit(p2, 1, 0, PAGE_READONLY);
+    cout << "Закоммиченно ещё" << endl;
+
+    cout << "Адрес: " << p2 << endl;
+    if (VirtualQuery(p2, &lpBuffer3, sizeof(lpBuffer3)) == 0) {
+        cout << "Ошибка VirtualQuery 3: " << GetLastError() << endl;
+    }
+    cout << "State: " << stateToString(lpBuffer3.State) << endl;
+    cout << "Protect: " << protectToString(lpBuffer3.Protect) << endl
+         << endl;
     return 0;
 }
