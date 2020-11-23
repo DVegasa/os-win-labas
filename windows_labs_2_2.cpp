@@ -16,7 +16,7 @@ DWORD getPageSize() {
 
 LPVOID doAlloc(int n) {
     LPVOID lpAddress;
-    if (VirtualAlloc(lpAddress, getPageSize(), MEM_RESERVE, PAGE_READWRITE) == NULL) {
+    if (VirtualAlloc(lpAddress, getPageSize() * n, MEM_RESERVE, PAGE_READWRITE) == NULL) {
         throw ERR_ALLOCATION;
     }
     return lpAddress;
@@ -28,14 +28,14 @@ int main(void) {
     cout << "Введите кол-во страниц для резервации: " << endl;
     int n;
     cin >> n;
-    LPVOID lpAddress;
+    LPVOID lpBase;
     try {
-        lpAddress = doAlloc(n);
+        lpBase = doAlloc(n);
     } catch (string s) {
         cout << s << endl;
         return -1;
     }
-    cout << "Начальный адрес: " << lpAddress;
+    cout << "Начальный адрес: " << lpBase << endl;
     // 2
     return 0;
 }
