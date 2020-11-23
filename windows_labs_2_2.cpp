@@ -94,7 +94,7 @@ int main(void) {
         return 0;
     }
 
-    cout << "С какой страницы начать коммитить?" << endl;
+    cout << "С какой страницы начать коммитить (индексация с нуля)?" << endl;
     int from;
     cin >> from;
     if (from + nCommit > n) {
@@ -162,5 +162,44 @@ int main(void) {
     cout << "State: " << stateToString(lpBuffer3.State) << endl;
     cout << "Protect: " << protectToString(lpBuffer3.Protect) << endl
          << endl;
+
+    // 6
+    cout << "Сколько страниц освободить?" << endl;
+    int nToDecommit;
+    cin >> nToDecommit;
+    cout << "С какой страницы (индексация с нуля)?" << endl;
+    int toDecommitFrom;
+    cin >> toDecommitFrom;
+
+    if (nToDecommit < 0 || toDecommitFrom < 0) {
+        cout << "Ошибка: отрицательные числа недопустимы" << endl;
+        return 0;
+    }
+
+    if (toDecommitFrom >= n) {
+        cout << "Ошибка: стартовое значение больше выделенных страниц" << endl;
+        return 0;
+    }
+
+    // Если для освобождения хотят больше страниц чем выделенно, число округлится
+    // до максимально возможного с данной страницы toDecommitFrom
+    int maxToFree = n - toDecommitFrom;
+    if (toDecommitFrom > maxToFree) toDecommitFrom = maxToFree;
+    LPVOID pDecommit = lpBase + (getPageSize() * toDecommitFrom);
+    if (VirtualFree(pDecommit, getPageSize() * toDecommitFrom, MEM_DECOMMIT) == 0) {
+        cout << "Ошибка VirtualFree: " << GetLastError() << endl;
+        return 0;
+    }
+    cout << "Декоммит с адреса: " << pDecommit << endl;
+
+    MEMORY_BASIC_INFORMATION lpBuffer4;
+    if (VirtualQuery(pDecommit, &lpBuffer4, sizeof(lpBuffer4)) == 0) {
+        cout << "Ошибка VirtualQuery 4: " << GetLastError() << endl;
+    }
+    cout << "State: " << stateToString(lpBuffer4.State) << endl;
+    cout << "Protect: " << protectToString(lpBuffer4.Protect) << endl
+         << endl;
+
+    // 7
     return 0;
 }
