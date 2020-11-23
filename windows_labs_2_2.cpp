@@ -201,5 +201,10 @@ int main(void) {
          << endl;
 
     // 7
+    cout << "Релиз памяти с адреса: " << lpBase << endl;
+    if (VirtualFree(lpBase, 0, MEM_RELEASE) == 0) {
+        cout << "Ошибка VirtualFree: " << GetLastError() << endl;
+        return 0;
+    }
     return 0;
 }
