@@ -16,8 +16,8 @@ DWORD getPageSize() {
 }
 
 LPVOID doAlloc(int n) {
-    LPVOID lpAddress;
-    if (VirtualAlloc(lpAddress, getPageSize() * n, MEM_RESERVE, PAGE_READWRITE) == NULL) {
+    LPVOID lpAddress = VirtualAlloc(NULL, getPageSize() * n, MEM_RESERVE, PAGE_READWRITE);
+    if (lpAddress == NULL) {
         throw ERR_ALLOCATION;
     }
     return lpAddress;
@@ -69,5 +69,16 @@ int main(void) {
     LPVOID lpComitted = lpBase;
     commit(lpComitted, nCommit, from);
     cout << "Коммиты начинаются с: " << lpComitted << endl;
+
+    return 0;
+    // 3
+    const int SIZE = 3;
+    int a[SIZE] = {42, -100, 24}; // 32 bytes
+    LPDWORD pointer = (LPDWORD) lpComitted;
+    errno_t err = memcpy_s(pointer, sizeof(pointer), a, sizeof(int) * SIZE);
+    if (err) {
+        cout << "Ошибка при memcpy_s" << endl;
+        return 0;
+    }
     return 0;
 }
