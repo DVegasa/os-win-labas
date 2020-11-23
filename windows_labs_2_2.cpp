@@ -70,15 +70,22 @@ int main(void) {
     commit(lpComitted, nCommit, from);
     cout << "Коммиты начинаются с: " << lpComitted << endl;
 
-    return 0;
     // 3
     const int SIZE = 3;
-    int a[SIZE] = {42, -100, 24}; // 32 bytes
+    DWORD a[SIZE] = {42, 100, 24}; 
     LPDWORD pointer = (LPDWORD) lpComitted;
-    errno_t err = memcpy_s(pointer, sizeof(pointer), a, sizeof(int) * SIZE);
-    if (err) {
-        cout << "Ошибка при memcpy_s" << endl;
-        return 0;
+    errno_t err = memcpy_s(pointer, sizeof(pointer) * SIZE, a, sizeof(DWORD) * SIZE);
+    if (err == EINVAL) {
+        cout << "Ошибка при memcpy_s EINVAL: " << err << endl;
     }
+    if (err == ERANGE) {
+        cout << "Ошибка при memcpy_s ERANGE: " << err << endl;
+    }
+
+    cout << "Содержимое pointer: " << endl;
+    for (int i = 0; i < SIZE; i++) {
+        cout << pointer[i] << endl;
+    }
+    cout << "-----------" << endl;
     return 0;
 }
