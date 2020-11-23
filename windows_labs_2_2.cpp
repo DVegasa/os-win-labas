@@ -24,13 +24,13 @@ LPVOID doAlloc(int n) {
 }
 
 void commit(LPVOID& lpAddress, int n, int shift) {
-    cout << "#commit before: " << lpAddress << endl;
+    // cout << "#commit before: " << lpAddress << endl;
     lpAddress = lpAddress + getPageSize() * shift;
-    
+
     if (VirtualAlloc(lpAddress, getPageSize() * n, MEM_COMMIT, PAGE_READWRITE) == NULL) {
         throw ERR_COMMIT;
     }
-    cout << "#commit after: " << lpAddress << endl;
+    // cout << "#commit after: " << lpAddress << endl;
 }
 
 int main(void) {
@@ -46,12 +46,28 @@ int main(void) {
         cout << s << endl;
         return -1;
     }
-    cout << "Начальный адрес: " << lpBase << endl;
+    cout << "Начальный адрес резервов: " << lpBase << endl;
+
     // 2
     cout << "Введите кол-во страниц для коммита: " << endl;
     int nCommit;
     cin >> nCommit;
-    LPVOID lp2 = lpBase;
-    commit(lp2, nCommit, 1);
+
+    if (nCommit > n) {
+        cout << "Зарезервировано только " << n << " страница. Программа завершается" << endl;
+        return 0;
+    }
+
+    cout << "С какой страницы начать коммитить?" << endl;
+    int from;
+    cin >> from;
+    if (from + nCommit > n) {
+        cout << "Ты выйдешь за границу. Программа завершается" << endl;
+        return 0;
+    }
+
+    LPVOID lpComitted = lpBase;
+    commit(lpComitted, nCommit, from);
+    cout << "Коммиты начинаются с: " << lpComitted << endl;
     return 0;
 }
