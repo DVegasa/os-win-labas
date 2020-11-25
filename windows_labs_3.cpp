@@ -60,7 +60,7 @@ int main(void) {
     // Сортировка
     for (int i = 0; i < SIZE; i++) {
         for (int j = SIZE - 1; j > i; j--) {
-            if (length(processHeap, ar[j - 1]) < length(processHeap, ar[j])) {
+            if (length(processHeap, ar[j - 1]) > length(processHeap, ar[j])) {
                 // Поменять местами [j-1] и [j]
 
                 // Буфер для обмена
@@ -88,7 +88,7 @@ int main(void) {
     }
 
     // Выводим отсортированный
-    cout << "Finish Output:" << endl;
+    cout << "Отсортированный:" << endl;
     for (int i = 0; i < SIZE; i++) {
         cout << " a#" << i << ": ";
         for (int j = 0; j < length(processHeap, ar[i]); j++) {
