@@ -11,14 +11,19 @@ void error(string msg) {
     exit(0);
 }
 
+int length(HANDLE heap, int* p) {
+    int size = HeapSize(heap, 0, p);
+    return (size / sizeof(int)) ;
+}
+
 int main(void) {
     srand(time(0));
-    const int SIZE = 5;
     HANDLE processHeap = GetProcessHeap();
     if (processHeap == NULL) {
         error("processHeap");
     }
 
+    const int SIZE = 5;
     int* ar[SIZE];
     // Генерация исходных данных
     for (int i = 0; i < SIZE; i++) {
@@ -47,13 +52,16 @@ int main(void) {
     // Вывод на экран размеров массивов
     cout << "Размеры" << endl;
     for (int i = 0; i < SIZE; i++) {
-        int size = HeapSize(processHeap, 0, ar[i]);
-        cout << "#" << i << ": " << (size / sizeof(int)) << endl;
+        // int size = HeapSize(processHeap, 0, ar[i]);
+        // cout << "#" << i << ": " << (size / sizeof(int)) << endl;
+        cout << "#" << i << ": " << length(processHeap, ar[i]) << endl;
     }
 
     // Сортировка
-    for (int i = 0; i < SIZE; i++) {
-        
-    }
+    // for (int i = 0; i < SIZE; i++) {
+    //     for (int j = SIZE-1; j > i; j--) {
+    //         if ()
+    //     }
+    // }
     return 0;   
 }
