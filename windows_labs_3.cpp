@@ -1,7 +1,8 @@
-#include <iostream>
-#include <string>
 #include <time.h>
+
+#include <iostream>
 #include <random>
+#include <string>
 
 #include "utils.cpp"
 #include "windows.h"
@@ -13,7 +14,7 @@ void error(string msg) {
 
 int length(HANDLE heap, int* p) {
     int size = HeapSize(heap, 0, p);
-    return (size / sizeof(int)) ;
+    return (size / sizeof(int));
 }
 
 int main(void) {
@@ -27,7 +28,7 @@ int main(void) {
     int* ar[SIZE];
     // Генерация исходных данных
     for (int i = 0; i < SIZE; i++) {
-        int length = rand() % 15 + 1; 
+        int length = rand() % 15 + 1;
         int* a = (int*)HeapAlloc(processHeap, 0, sizeof(int) * length);
         for (int j = 0; j < length; j++) {
             a[j] = rand() % 10;  // диапазон [0, 9] чтобы удобно выводить на консоль
@@ -46,22 +47,55 @@ int main(void) {
         for (int j = 0; j < length; j++) {
             cout << ar[i][j] << " ";
         }
-        cout << endl << endl;
+        cout << endl
+             << endl;
     }
 
     // Вывод на экран размеров массивов
     cout << "Размеры" << endl;
     for (int i = 0; i < SIZE; i++) {
-        // int size = HeapSize(processHeap, 0, ar[i]);
-        // cout << "#" << i << ": " << (size / sizeof(int)) << endl;
         cout << "#" << i << ": " << length(processHeap, ar[i]) << endl;
     }
 
     // Сортировка
-    // for (int i = 0; i < SIZE; i++) {
-    //     for (int j = SIZE-1; j > i; j--) {
-    //         if ()
-    //     }
-    // }
-    return 0;   
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = SIZE - 1; j > i; j--) {
+            if (length(processHeap, ar[j - 1]) < length(processHeap, ar[j])) {
+                // Поменять местами [j-1] и [j]
+
+                // Буфер для обмена
+                int* t = (int*) HeapAlloc(processHeap, 0, sizeof(int) * length(processHeap, ar[j - 1]));
+                for (int k = 0; k < length(processHeap, ar[j-1]); k++) { 
+                    // Копипастим значения в буфер
+                    t[k] = ar[j-1][k];
+                }
+
+                // Уменьшаем размер массива
+                ar[j-1] = (int*) HeapReAlloc(processHeap, 0, ar[j-1], sizeof(int) * length(processHeap, ar[j]));
+                for (int k = 0; k < length(processHeap, ar[j]); k++) { 
+                    // Копипастим значения в урезанный массив
+                    ar[j-1][k] = ar[j][k];
+                }
+
+                // Урезаем в длине другой массив
+                ar[j] = (int*) HeapReAlloc(processHeap, 0, ar[j], sizeof(int) * length(processHeap, t));
+                for (int k = 0; k < length(processHeap, t); k++) {
+                    // Копипастим значения из буфера в массив
+                    ar[j][k] = t[k];
+                }
+            }
+        }
+    }
+
+    // Выводим отсортированный
+    cout << "Finish Output:" << endl;
+    for (int i = 0; i < SIZE; i++) {
+        cout << " a#" << i << ": ";
+        for (int j = 0; j < length(processHeap, ar[i]); j++) {
+            cout << ar[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
 }
