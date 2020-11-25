@@ -96,7 +96,7 @@ int main(void) {
     // Выводим отсортированный
     cout << "Отсортированный:" << endl;
     for (int i = 0; i < SIZE; i++) {
-        cout << " a#" << i << ": ";
+        cout << "ar#" << i << ": ";
         for (int j = 0; j < length(processHeap, ar[i]); j++) {
             cout << ar[i][j] << " ";
         }
