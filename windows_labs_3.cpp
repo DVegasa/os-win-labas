@@ -14,6 +14,7 @@ void error(string msg) {
 
 int length(HANDLE heap, int* p) {
     int size = HeapSize(heap, 0, p);
+    if (size == (SIZE_T)-1) error("HeapSize");
     return (size / sizeof(int));
 }
 
@@ -30,6 +31,8 @@ int main(void) {
     for (int i = 0; i < SIZE; i++) {
         int length = rand() % 15 + 1;
         int* a = (int*)HeapAlloc(processHeap, 0, sizeof(int) * length);
+        if (a == NULL) error("HeapAlloc at " + i);
+
         for (int j = 0; j < length; j++) {
             a[j] = rand() % 10;  // диапазон [0, 9] чтобы удобно выводить на консоль
         }
@@ -64,21 +67,24 @@ int main(void) {
                 // Поменять местами [j-1] и [j]
 
                 // Буфер для обмена
-                int* t = (int*) HeapAlloc(processHeap, 0, sizeof(int) * length(processHeap, ar[j - 1]));
-                for (int k = 0; k < length(processHeap, ar[j-1]); k++) { 
+                int* t = (int*)HeapAlloc(processHeap, 0, sizeof(int) * length(processHeap, ar[j - 1]));
+                if (t == NULL) error("HeapAlloc");
+                for (int k = 0; k < length(processHeap, ar[j - 1]); k++) {
                     // Копипастим значения в буфер
-                    t[k] = ar[j-1][k];
+                    t[k] = ar[j - 1][k];
                 }
 
                 // Уменьшаем размер массива
-                ar[j-1] = (int*) HeapReAlloc(processHeap, 0, ar[j-1], sizeof(int) * length(processHeap, ar[j]));
-                for (int k = 0; k < length(processHeap, ar[j]); k++) { 
+                ar[j - 1] = (int*)HeapReAlloc(processHeap, 0, ar[j - 1], sizeof(int) * length(processHeap, ar[j]));
+                if (ar[j - 1] == NULL) error("HeapReAlloc");
+                for (int k = 0; k < length(processHeap, ar[j]); k++) {
                     // Копипастим значения в урезанный массив
-                    ar[j-1][k] = ar[j][k];
+                    ar[j - 1][k] = ar[j][k];
                 }
 
                 // Урезаем в длине другой массив
-                ar[j] = (int*) HeapReAlloc(processHeap, 0, ar[j], sizeof(int) * length(processHeap, t));
+                ar[j] = (int*)HeapReAlloc(processHeap, 0, ar[j], sizeof(int) * length(processHeap, t));
+                if (ar[j] == NULL) error("HeapReAlloc");
                 for (int k = 0; k < length(processHeap, t); k++) {
                     // Копипастим значения из буфера в массив
                     ar[j][k] = t[k];
@@ -97,5 +103,13 @@ int main(void) {
         cout << endl;
     }
 
+    // Освобождаем память
+    for (int i = 0; i < SIZE; i++) {
+        if (HeapFree(processHeap, 0, ar[i]) == 0) {
+            error("HeapFree: " + GetLastError());
+        } else {
+            cout << "Память освобождена" << endl;
+        }
+    }
     return 0;
 }
