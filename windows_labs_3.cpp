@@ -20,7 +20,7 @@ int main(void) {
     }
 
     for (int i = 0; i < SIZE; i++) {
-        int length = rand() % 9 + 1;
+        int length = rand() % 15 + 1;
         int* a = (int*)HeapAlloc(processHeap, 0, sizeof(int) * length);
         for (int i = 0; i < length; i++) {
             a[i] = rand() % 10;  // диапазон [0, 9] чтобы удобно выводить на консоль
