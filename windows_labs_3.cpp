@@ -7,11 +7,6 @@
 #include "utils.cpp"
 #include "windows.h"
 
-void error(string msg) {
-    cout << "Ошибка: " << msg << endl;
-    exit(0);
-}
-
 int length(HANDLE heap, int* p) {
     int size = HeapSize(heap, 0, p);
     if (size == (SIZE_T)-1) error("HeapSize");

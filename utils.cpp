@@ -31,3 +31,8 @@ string stringedSize(long long int bytes) {
     ss << result << " " << suffix;
     return ss.str();
 }
+
+void error(string msg) {
+    cout << "Ошибка: " << msg << endl;
+    exit(0);
+}
