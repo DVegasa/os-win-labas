@@ -5,36 +5,68 @@
 #include "windows.h"
 
 int main(void) {
-    LPCSTR lpApplicationName = NULL;
-    LPSTR lpCommandLine = "calc.exe"; 
+    // LPCSTR lpApplicationName = NULL;
+    // LPSTR lpCommandLine = "calc.exe";
+    // LPSECURITY_ATTRIBUTES lpProcessAttributes = NULL;
+    // LPSECURITY_ATTRIBUTES lpThreadAttributes = NULL;
+    // BOOL bInheritHandles = FALSE;  // возможно нужно будет менять
+    // DWORD dwCreationFlags = 0;
+    // LPVOID lpEnvironment = NULL;
+    // LPCSTR lpCurrentDirectory = NULL;
+    // STARTUPINFOA si;
+    // PROCESS_INFORMATION pi;
+
+    // ZeroMemory(&si, sizeof(si));
+    // si.cb = sizeof(si);
+    // ZeroMemory(&pi, sizeof(pi));
+
+    // if (0 == CreateProcessA(
+    //              lpApplicationName,
+    //              lpCommandLine,
+    //              lpProcessAttributes,
+    //              lpThreadAttributes,
+    //              bInheritHandles,
+    //              dwCreationFlags,
+    //              lpEnvironment,
+    //              lpCurrentDirectory,
+    //              &si,
+    //              &pi)) {
+    //     error("CreateProcessA: " + GetLastError());
+    // }
+
+    // --------------------------
+
+    LPCTSTR lpApplicationName = NULL;
+    LPTSTR lpCommandLine = "C:\\Windows\\SysWOW64\\calc.exe";
     LPSECURITY_ATTRIBUTES lpProcessAttributes = NULL;
     LPSECURITY_ATTRIBUTES lpThreadAttributes = NULL;
-    BOOL bInheritHandles = FALSE;  // возможно нужно будет менять
-    DWORD dwCreationFlags = 0;
+    BOOL bInheritHandles = TRUE;
+    DWORD dwCreationFlags = NULL;
     LPVOID lpEnvironment = NULL;
-    LPCSTR lpCurrentDirectory = NULL;
-    STARTUPINFOA si;
+    LPCTSTR lpCurrentDirectory = NULL;
+    STARTUPINFO lpStartupInfo;
     PROCESS_INFORMATION pi;
 
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
-    ZeroMemory(&pi, sizeof(pi));
+    ZeroMemory(&lpStartupInfo, sizeof(STARTUPINFO));
 
-    if (0 == CreateProcessA(
-                 lpApplicationName,
-                 lpCommandLine,
-                 lpProcessAttributes,
-                 lpThreadAttributes,
-                 bInheritHandles,
-                 dwCreationFlags,
-                 lpEnvironment,
-                 lpCurrentDirectory,
-                 &si,
-                 &pi)) {
-        error("CreateProcessA: " + GetLastError());
+    if (0 == CreateProcess(
+        lpApplicationName,    // имя исполняемого модуля
+        lpCommandLine,        // Командная строка
+        lpProcessAttributes,  // Указатель на структуру SECURITY_ATTRIBUTES
+        lpThreadAttributes,   // Указатель на структуру SECURITY_ATTRIBUTES
+        bInheritHandles,      // Флаг наследования текущего процесса
+        dwCreationFlags,      // Флаги способов создания процесса
+        lpEnvironment,        // Указатель на блок среды
+        lpCurrentDirectory,   // Текущий диск или каталог
+        &lpStartupInfo,       // Указатель нас структуру STARTUPINFO
+        &pi                   // Указатель нас структуру PROCESS_INFORMATION
+    )) {
+         cout << "#Error: CreateProccess: " << GetLastError();
     }
 
-    print("Successfully created:\ndwProcessId=" + pi.dwProcessId);
+    // ------------------------
+    cout << "Successfully created: dwProcessId=" << pi.dwProcessId << endl;
+    cout << "Successfully created: dwThreadId=" << pi.dwThreadId << endl;
 
     while (true) {
         print();
@@ -46,11 +78,16 @@ int main(void) {
         cin >> c;
 
         if (c == 't') {
-            TerminateProcess(pi.hProcess, 0);
-            CloseHandle(pi.hProcess);
-            CloseHandle(pi.hThread);
-            print("Terminated");
-            break;
+             if (0 == TerminateProcess(pi.hProcess, NO_ERROR)) {
+                cout << "#Error: TerminateProcess: " << GetLastError();
+                exit(0);
+            }
+            else {
+                CloseHandle(pi.hProcess);
+                CloseHandle(pi.hThread);
+                print("Terminated");
+                break;
+            }
         }
     }
 
