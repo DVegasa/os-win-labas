@@ -36,3 +36,7 @@ void error(string msg) {
     cout << "Ошибка: " << msg << endl;
     exit(0);
 }
+
+void print(string msg = "") {
+    cout << msg << endl;
+}
