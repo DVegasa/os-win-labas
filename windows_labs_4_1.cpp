@@ -5,6 +5,7 @@
 #include "windows.h"
 
 int main(void) {
+    // #region a
     // LPCSTR lpApplicationName = NULL;
     // LPSTR lpCommandLine = "calc.exe";
     // LPSECURITY_ATTRIBUTES lpProcessAttributes = NULL;
@@ -15,11 +16,11 @@ int main(void) {
     // LPCSTR lpCurrentDirectory = NULL;
     // STARTUPINFOA si;
     // PROCESS_INFORMATION pi;
-
+//
     // ZeroMemory(&si, sizeof(si));
     // si.cb = sizeof(si);
     // ZeroMemory(&pi, sizeof(pi));
-
+//
     // if (0 == CreateProcessA(
     //              lpApplicationName,
     //              lpCommandLine,
@@ -33,22 +34,23 @@ int main(void) {
     //              &pi)) {
     //     error("CreateProcessA: " + GetLastError());
     // }
+    // #endregion a
 
+    // #region normal
     // --------------------------
-
     LPCTSTR lpApplicationName = NULL;
-    LPTSTR lpCommandLine = "C:\\Windows\\SysWOW64\\calc.exe";
+    LPTSTR lpCommandLine = "calc.exe";
     LPSECURITY_ATTRIBUTES lpProcessAttributes = NULL;
     LPSECURITY_ATTRIBUTES lpThreadAttributes = NULL;
-    BOOL bInheritHandles = TRUE;
-    DWORD dwCreationFlags = NULL;
+    BOOL bInheritHandles = FALSE;
+    DWORD dwCreationFlags = 0;
     LPVOID lpEnvironment = NULL;
     LPCTSTR lpCurrentDirectory = NULL;
     STARTUPINFO lpStartupInfo;
     PROCESS_INFORMATION pi;
-
-    ZeroMemory(&lpStartupInfo, sizeof(STARTUPINFO));
-
+    ZeroMemory(&lpStartupInfo, sizeof(lpStartupInfo));
+    lpStartupInfo.cb = sizeof(lpStartupInfo);
+    ZeroMemory(&pi, sizeof(pi));
     if (0 == CreateProcess(
         lpApplicationName,    // имя исполняемого модуля
         lpCommandLine,        // Командная строка
@@ -62,9 +64,13 @@ int main(void) {
         &pi                   // Указатель нас структуру PROCESS_INFORMATION
     )) {
          cout << "#Error: CreateProccess: " << GetLastError();
+         exit(0);
     }
-
     // ------------------------
+    // #endregion normal
+
+    WaitForSingleObject(pi.hProcess, INFINITE);
+    Sleep(100);
     cout << "Successfully created: dwProcessId=" << pi.dwProcessId << endl;
     cout << "Successfully created: dwThreadId=" << pi.dwThreadId << endl;
 
@@ -78,7 +84,7 @@ int main(void) {
         cin >> c;
 
         if (c == 't') {
-             if (0 == TerminateProcess(pi.hProcess, NO_ERROR)) {
+            if (0 == TerminateProcess(pi.hProcess, NO_ERROR)) {
                 cout << "#Error: TerminateProcess: " << GetLastError();
                 exit(0);
             }
