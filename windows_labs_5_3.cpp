@@ -90,7 +90,11 @@ int main(void) {
      на крит секции, но я её не стал делать чтобы избежать усложнения кода 
      нерелавнтными целями
     */
-    WaitForMultipleObjects(2, handles, TRUE, INFINITE);
+    if (WaitForMultipleObjects(2, handles, TRUE, INFINITE) != WAIT_OBJECT_0) {
+        cout << "#Error: WaitForMultipleObjects: " << GetLastError();
+        DeleteCriticalSection(&crit);
+        ExitProcess(0);
+    }
     cout << "\nAfter WaitForMultipleObjects\n";
     DeleteCriticalSection(&crit);
 }
