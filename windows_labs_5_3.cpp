@@ -80,6 +80,16 @@ int main(void) {
     handles[0] = aThread;
     handles[1] = bThread;
     cout << "\nBefore WaitForMultipleObjects\n";
+    /*
+     Иногда может быть такой вывод
+        a0:a
+        Before WaitForMultipleObjects
+        bcdefghijklmnopqrstuvwxyz
+     он связан с тем, что в объект cout передача происходит одновременно и из потока а,
+     и из основного потока main. Чтобы это исправить сюда тоже можно сделать синхронизацию
+     на крит секции, но я её не стал делать чтобы избежать усложнения кода 
+     нерелавнтными целями
+    */
     WaitForMultipleObjects(2, handles, TRUE, INFINITE);
     cout << "\nAfter WaitForMultipleObjects\n";
     DeleteCriticalSection(&crit);
