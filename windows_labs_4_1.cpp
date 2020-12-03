@@ -17,16 +17,16 @@ int main(void) {
     si.cb = sizeof(si);
 
     if (0 == CreateProcess(
-                 NULL,        // имя исполняемого модуля
+                 NULL,           // имя исполняемого модуля
                  "notepad.exe",  // Командная строка
-                 NULL,        // Указатель на структуру SECURITY_ATTRIBUTES
-                 NULL,        // Указатель на структуру SECURITY_ATTRIBUTES
-                 FALSE,       // Флаг наследования текущего процесса
-                 0,           // Флаги способов создания процесса
-                 0,           // Указатель на блок среды
-                 NULL,        // Текущий диск или каталог
-                 &si,         // Указатель нас структуру STARTUPINFO
-                 &pi          // Указатель нас структуру PROCESS_INFORMATION
+                 NULL,           // Указатель на структуру SECURITY_ATTRIBUTES
+                 NULL,           // Указатель на структуру SECURITY_ATTRIBUTES
+                 FALSE,          // Флаг наследования текущего процесса
+                 0,              // Флаги способов создания процесса
+                 0,              // Указатель на блок среды
+                 NULL,           // Текущий диск или каталог
+                 &si,            // Указатель нас структуру STARTUPINFO
+                 &pi             // Указатель нас структуру PROCESS_INFORMATION
                  )) {
         cout << "#Error: CreateProccess: " << GetLastError();
         exit(0);
@@ -59,7 +59,7 @@ int main(void) {
             }
 
         } else if (c == 's') {
-            if (SuspendThread(pi.hThread) == (DWORD) - 1) {
+            if (SuspendThread(pi.hThread) == (DWORD)-1) {
                 cout << "#Error: SuspendThread: " << GetLastError();
                 break;
             } else {
@@ -75,7 +75,7 @@ int main(void) {
             }
         }
     }
-    
+
     if (isClosed == false) {
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
