@@ -11,19 +11,35 @@ using namespace std;
 
 DWORD a(LPVOID _) {
     for (int i = 0; i < 10; i++) {
-        cout << "ABCDEFGHIJ\n";
+        cout << "a" + to_string(i) + ":";
+        for (char c = 'a'; c <= 'z'; c++) {
+            cout << c;
+            // Sleep(50);
+        }
+        cout << endl;
     }
     return 0;
 }
 
 DWORD b(LPVOID _) {
     for (int i = 0; i < 10; i++) {
-        cout << "0123456789\n";
+        cout << "b" + to_string(i) + ":";
+        for (char c = '0'; c <= '9'; c++) {
+            cout << c;
+            // Sleep(50);
+        }
+        cout << endl;
     }
     return 0;
 }
 
 int main(void) {
+    // Проверяем каждую функцию при синхронном запуске
+    cout << "init" << endl;
+    a(LPVOID());
+    b(LPVOID());
+    cout << "--------" << endl;
+
     // Создаём первый поток
     DWORD aInfo;
     HANDLE aThread = CreateThread(
@@ -37,7 +53,7 @@ int main(void) {
         cout << "#error: CreateThread@a: " << GetLastError();
         ExitProcess(0);  // This will automatically clean up threads and memory.
     }
-    
+
     // Создаём второй поток
     DWORD bInfo;
     HANDLE bThread = CreateThread(
@@ -51,12 +67,12 @@ int main(void) {
         cout << "#error: CreateThread@b: " << GetLastError();
         ExitProcess(0);  // This will automatically clean up threads and memory.
     }
-    
+
     // Ждём их
     HANDLE handles[2];
     handles[0] = aThread;
     handles[1] = bThread;
-    cout << "Before WaitForMultipleObjects" << endl;
+    cout << "\nBefore WaitForMultipleObjects\n";
     WaitForMultipleObjects(2, handles, TRUE, INFINITE);
-    cout << "After WaitForMultipleObjects" << endl;
+    cout << "\nAfter WaitForMultipleObjects\n";
 }
