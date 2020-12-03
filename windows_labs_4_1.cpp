@@ -35,6 +35,8 @@ int main(void) {
     cout << "Successfully created: dwProcessId=" << pi.dwProcessId << endl;
     cout << "Successfully created: dwThreadId=" << pi.dwThreadId << endl;
 
+    bool isSuspended = false;
+    bool isClosed = false;
     while (true) {
         cout << endl;
         cout << "s: SuspendThread()" << endl;
@@ -47,15 +49,37 @@ int main(void) {
         if (c == 't') {
             if (0 == TerminateProcess(pi.hProcess, NO_ERROR)) {
                 cout << "#Error: TerminateProcess: " << GetLastError();
-                exit(0);
+                break;
             } else {
                 CloseHandle(pi.hProcess);
                 CloseHandle(pi.hThread);
+                isClosed = true;
                 cout << "Terminated" << endl;
                 break;
             }
+
+        } else if (c == 's') {
+            if (SuspendThread(pi.hThread) == (DWORD) - 1) {
+                cout << "#Error: SuspendThread: " << GetLastError();
+                break;
+            } else {
+                cout << "Suspended OK" << endl;
+            }
+
+        } else if (c == 'r') {
+            if (ResumeThread(pi.hThread) == (DWORD)-1) {
+                cout << "#Error: ResumeThread: " << GetLastError();
+                break;
+            } else {
+                cout << "Resume OK" << endl;
+            }
         }
     }
-
+    
+    if (isClosed == false) {
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+        isClosed = true;
+    }
     cout << "Global exit" << endl;
 }
