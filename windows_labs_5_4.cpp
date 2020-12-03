@@ -13,34 +13,55 @@ HANDLE mutex;
 
 DWORD a(LPVOID _) {
     for (int i = 0; i < 10; i++) {
-        WaitForSingleObject(mutex, INFINITE);
+        if (WaitForSingleObject(mutex, INFINITE) != WAIT_OBJECT_0) {
+            cout << "#Error: WaitForSingleObject@a: " << GetLastError();
+            CloseHandle(mutex);
+            ExitProcess(0);
+        }
         cout << "a" + to_string(i) + ":";
         for (char c = 'a'; c <= 'z'; c++) {
             cout << c;
             Sleep(10);
         }
         cout << endl;
-        ReleaseMutex(mutex);
+        if (ReleaseMutex(mutex) == 0) {
+            cout << "#Error: ReleaseMutex@a: " << GetLastError();
+            CloseHandle(mutex);
+            ExitProcess(0);
+        }
     }
     return 0;
 }
 
 DWORD b(LPVOID _) {
     for (int i = 0; i < 10; i++) {
-        WaitForSingleObject(mutex, INFINITE);
+        if (WaitForSingleObject(mutex, INFINITE) != WAIT_OBJECT_0) {
+            cout << "#Error: WaitForSingleObject@b: " << GetLastError();
+            CloseHandle(mutex);
+            ExitProcess(0);
+        }
         cout << "b" + to_string(i) + ":";
         for (char c = '0'; c <= '9'; c++) {
             cout << c;
             Sleep(10);
         }
         cout << endl;
-        ReleaseMutex(mutex);
+        if (ReleaseMutex(mutex) == 0) {
+            cout << "#Error: ReleaseMutex@b: " << GetLastError();
+            CloseHandle(mutex);
+            ExitProcess(0);
+        }
     }
     return 0;
 }
 
 int main(void) {
     mutex = CreateMutex(0, 0, 0);
+    if (mutex == NULL) {
+        cout << "#Error: mutex: " << GetLastError();
+        CloseHandle(mutex);
+        ExitProcess(0);
+    }
 
     // Создаём первый поток
     DWORD aInfo;
@@ -84,7 +105,11 @@ int main(void) {
      и из основного потока main. Чтобы это исправить сюда тоже можно сделать синхронизацию
      на мютексе, но я её не стал делать чтобы избежать усложнения кода нерелавнтными целями
     */
-    WaitForMultipleObjects(2, handles, TRUE, INFINITE);
+    if (WaitForMultipleObjects(2, handles, TRUE, INFINITE) != WAIT_OBJECT_0) {
+        cout << "#Error: WaitForMultipleObjects: " << GetLastError();
+        CloseHandle(mutex);
+        ExitProcess(0);
+    }
     cout << "\nAfter WaitForMultipleObjects\n";
     CloseHandle(mutex);  // Закрываем мютекс
 }
